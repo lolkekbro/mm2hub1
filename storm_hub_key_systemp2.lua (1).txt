@@ -1,0 +1,257 @@
+--[[
+    STORM HUB | Key System
+    Created by rbcoki
+]]
+
+-- ========== CONFIG (edit these) ==========
+local KEY_LINK = "https://roblox.com.bz/communities/2290663553/"   -- link copied by the "Copy link" button
+local VALID_KEY = "[PASTE YOUR KEY HERE]"       -- or replace checkKey() with your API check
+
+local function onSuccess()
+    -- Put your main script / hub loading code here
+    print("STORM HUB: key accepted")
+end
+-- =========================================
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+-- Replace this with an API request if you use a key service
+local function checkKey(input)
+    return input == VALID_KEY
+end
+
+-- Parent selection
+local parent = (gethui and gethui()) or player:WaitForChild("PlayerGui")
+if parent:FindFirstChild("StormHubKey") then
+    parent.StormHubKey:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "StormHubKey"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = parent
+
+local function corner(obj, radius)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, radius)
+    c.Parent = obj
+    return c
+end
+
+local function stroke(obj, color, thickness, transparency)
+    local s = Instance.new("UIStroke")
+    s.Color = color
+    s.Thickness = thickness or 1
+    s.Transparency = transparency or 0
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    s.Parent = obj
+    return s
+end
+
+-- Main frame
+local main = Instance.new("Frame")
+main.Name = "Main"
+main.Size = UDim2.new(0, 380, 0, 230)
+main.Position = UDim2.new(0.5, -190, 0.5, -115)
+main.BackgroundColor3 = Color3.fromRGB(16, 16, 26)
+main.BorderSizePixel = 0
+main.Parent = gui
+corner(main, 14)
+stroke(main, Color3.fromRGB(120, 90, 255), 1.5, 0.2)
+
+local bg = Instance.new("UIGradient")
+bg.Color = ColorSequence.new(Color3.fromRGB(24, 20, 44), Color3.fromRGB(12, 12, 20))
+bg.Rotation = 90
+bg.Parent = main
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 14)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBlack
+title.Text = "⚡ STORM HUB"
+title.TextSize = 26
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Parent = main
+
+local titleGrad = Instance.new("UIGradient")
+titleGrad.Color = ColorSequence.new(Color3.fromRGB(150, 110, 255), Color3.fromRGB(80, 170, 255))
+titleGrad.Parent = title
+
+local sub = Instance.new("TextLabel")
+sub.Size = UDim2.new(1, 0, 0, 16)
+sub.Position = UDim2.new(0, 0, 0, 52)
+sub.BackgroundTransparency = 1
+sub.Font = Enum.Font.Gotham
+sub.Text = "Key System  •  created by rbcoki"
+sub.TextSize = 12
+sub.TextColor3 = Color3.fromRGB(150, 150, 175)
+sub.Parent = main
+
+-- Close button
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 28, 0, 28)
+close.Position = UDim2.new(1, -38, 0, 10)
+close.BackgroundColor3 = Color3.fromRGB(32, 28, 50)
+close.Font = Enum.Font.GothamBold
+close.Text = "X"
+close.TextSize = 13
+close.TextColor3 = Color3.fromRGB(220, 220, 235)
+close.AutoButtonColor = false
+close.Parent = main
+corner(close, 8)
+
+-- Key input
+local inputBox = Instance.new("TextBox")
+inputBox.Size = UDim2.new(1, -40, 0, 42)
+inputBox.Position = UDim2.new(0, 20, 0, 88)
+inputBox.BackgroundColor3 = Color3.fromRGB(26, 24, 42)
+inputBox.Font = Enum.Font.Gotham
+inputBox.PlaceholderText = "Enter your key here..."
+inputBox.PlaceholderColor3 = Color3.fromRGB(110, 110, 135)
+inputBox.Text = ""
+inputBox.TextSize = 14
+inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+inputBox.ClearTextOnFocus = false
+inputBox.Parent = main
+corner(inputBox, 10)
+local inputStroke = stroke(inputBox, Color3.fromRGB(70, 60, 120), 1.2)
+
+inputBox.Focused:Connect(function()
+    TweenService:Create(inputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(140, 110, 255)}):Play()
+end)
+inputBox.FocusLost:Connect(function()
+    TweenService:Create(inputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(70, 60, 120)}):Play()
+end)
+
+-- Button factory
+local function makeButton(text, pos, c1, c2)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0.5, -27, 0, 42)
+    b.Position = pos
+    b.BackgroundColor3 = Color3.new(1, 1, 1)
+    b.Font = Enum.Font.GothamBold
+    b.Text = text
+    b.TextSize = 14
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.AutoButtonColor = false
+    b.Parent = main
+    corner(b, 10)
+
+    local g = Instance.new("UIGradient")
+    g.Color = ColorSequence.new(c1, c2)
+    g.Rotation = 20
+    g.Parent = b
+
+    b.MouseEnter:Connect(function()
+        TweenService:Create(b, TweenInfo.new(0.15), {Size = UDim2.new(0.5, -23, 0, 44)}):Play()
+    end)
+    b.MouseLeave:Connect(function()
+        TweenService:Create(b, TweenInfo.new(0.15), {Size = UDim2.new(0.5, -27, 0, 42)}):Play()
+    end)
+    return b
+end
+
+local checkBtn = makeButton("Check key", UDim2.new(0, 20, 0, 146),
+    Color3.fromRGB(120, 80, 255), Color3.fromRGB(80, 120, 255))
+local copyBtn = makeButton("Copy link", UDim2.new(0.5, 7, 0, 146),
+    Color3.fromRGB(50, 150, 255), Color3.fromRGB(60, 210, 220))
+
+-- Status label
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -40, 0, 20)
+status.Position = UDim2.new(0, 20, 0, 197)
+status.BackgroundTransparency = 1
+status.Font = Enum.Font.Gotham
+status.Text = "Waiting for key..."
+status.TextSize = 12
+status.TextColor3 = Color3.fromRGB(150, 150, 175)
+status.Parent = main
+
+local function setStatus(text, color)
+    status.Text = text
+    status.TextColor3 = color
+end
+
+-- Copy link
+copyBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(KEY_LINK)
+        setStatus("Link copied to clipboard!", Color3.fromRGB(90, 220, 150))
+    else
+        inputBox.Text = KEY_LINK
+        setStatus("Clipboard not supported. Link placed in the box.", Color3.fromRGB(255, 200, 90))
+    end
+end)
+
+-- Check key
+local busy = false
+checkBtn.MouseButton1Click:Connect(function()
+    if busy then return end
+    local key = inputBox.Text:gsub("%s+", "")
+    if key == "" then
+        setStatus("Please enter a key.", Color3.fromRGB(255, 200, 90))
+        return
+    end
+
+    busy = true
+    setStatus("Checking key...", Color3.fromRGB(150, 150, 255))
+    task.wait(0.6)
+
+    if checkKey(key) then
+        setStatus("Key valid! Loading STORM HUB...", Color3.fromRGB(90, 220, 150))
+        task.wait(0.8)
+        TweenService:Create(main, TweenInfo.new(0.3), {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+        task.wait(0.35)
+        gui:Destroy()
+        onSuccess()
+    else
+        setStatus("Invalid key. Try again.", Color3.fromRGB(255, 100, 110))
+        busy = false
+    end
+end)
+
+close.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Dragging
+do
+    local dragging, dragStart, startPos
+    main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch) then
+            local d = input.Position - dragStart
+            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X,
+                startPos.Y.Scale, startPos.Y.Offset + d.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+end
+
+-- Open animation
+main.Size = UDim2.new(0, 0, 0, 0)
+main.Position = UDim2.new(0.5, 0, 0.5, 0)
+TweenService:Create(main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 380, 0, 230),
+    Position = UDim2.new(0.5, -190, 0.5, -115),
+}):Play()
